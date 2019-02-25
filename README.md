@@ -31,7 +31,7 @@ This disk, after being installed on a USB flash drive and booted from, effective
 
 ## Installation
 
-Download [image file from releases page](/ValdikSS/Super-UEFIinSecureBoot-Disk/stargazers/releases), write it to USB flash using one of the following programs:
+Download [image file from releases page](https://github.com/ValdikSS/Super-UEFIinSecureBoot-Disk/releases), write it to USB flash using one of the following programs:
 
 * [Rosa ImageWriter](http://wiki.rosalab.ru/en/index.php/ROSA_ImageWriter) (for Windows and Linux)
 * [Etcher](https://www.balena.io/etcher/) (for Windows, Linux and macOS)
