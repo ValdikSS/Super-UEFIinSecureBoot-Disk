@@ -36,6 +36,10 @@ Download [image file from releases page](https://github.com/ValdikSS/Super-UEFIi
 * [Rosa ImageWriter](http://wiki.rosalab.ru/en/index.php/ROSA_ImageWriter) (for Windows and Linux)
 * [Etcher](https://www.balena.io/etcher/) (for Windows, Linux and macOS)
 
+WARNING: all your USB flash data will be deleted.
+
+The image contains single FAT32 500MiB partition. Use [gparted](https://gparted.org/) or similar tool to resize it to get full USB drive space.
+
 ## Usage
 
 First boot on a PC with Secure Boot will show Access Violation message box. Press OK and choose "Enroll cert from file" menu option. Select `ENROLL_THIS_KEY_IN_MOKMANAGER.cer` and confirm certificate enrolling.
