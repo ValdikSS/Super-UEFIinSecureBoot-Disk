@@ -1,0 +1,28 @@
+From 660b90ff18f71274105605fb047ce603c2240d6d Mon Sep 17 00:00:00 2001
+From: ValdikSS <iam@valdikss.org.ru>
+Date: Sun, 24 Feb 2019 23:42:40 +0300
+Subject: [PATCH] Force GRUB Linux kernel loading method if shim is available
+
+shim hooks LoadImage(), StartImage() and ExitBootServices() UEFI functions to "Harden against non-participating bootloaders", and reboots the system if ExitBootServices is called without trying to boot the image using stock UEFI methods or verify it with shim protocol.
+GRUB is considered "participating bootloader" if shim_lock->verify is called, even if it's failed.
+Always call ->verify, ignore it and load it our way.
+---
+ grub-core/loader/efi/linux.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+index b56ea0b..43321cf 100644
+--- a/grub-core/loader/efi/linux.c
++++ b/grub-core/loader/efi/linux.c
+@@ -60,7 +60,7 @@ grub_linuxefi_secure_validate (void *data, grub_uint32_t size)
+   grub_dprintf ("secureboot", "Kernel signature verification failed (0x%lx)\n",
+ 		(unsigned long) status);
+ 
+-  return -1;
++  return 1;
+ }
+ 
+ #pragma GCC diagnostic push
+-- 
+2.20.1
+

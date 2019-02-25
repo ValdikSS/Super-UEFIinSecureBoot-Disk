@@ -1,0 +1,77 @@
+--- a/efitools-1.9.2/PreLoader.c	2019-01-09 01:13:13.000000000 +0300
++++ b/efitools-1.9.2/PreLoader.c	2019-02-25 05:24:46.808742187 +0300
+@@ -14,10 +14,7 @@
+ #include <security_policy.h>
+ #include <execute.h>
+ 
+-#include "hashlist.h"
+-
+-CHAR16 *loader = L"loader.efi";
+-CHAR16 *hashtool = L"HashTool.efi";
++CHAR16 *loader = L"grubia32_real.efi";
+ 
+ EFI_STATUS
+ efi_main (EFI_HANDLE image, EFI_SYSTEM_TABLE *systab)
+@@ -52,13 +49,6 @@
+ 		goto override;
+ 	}
+ 
+-	/* install statically compiled in hashes */
+-	security_protocol_set_hashes(_tmp_tmp_hash, _tmp_tmp_hash_len);
+-
+-	/* Check for H key being pressed */
+-	if (console_check_for_keystroke('H'))
+-		goto start_hashtool;
+-
+ 	status = execute(image, loader);
+ 
+ 	if (status == EFI_SUCCESS)
+@@ -74,48 +64,6 @@
+ 		goto out;
+ 	}
+ 
+-	console_alertbox((CHAR16 *[]) {
+-			L"Failed to start loader",
+-			L"",
+-			L"It should be called loader.efi (in the current directory)",
+-			L"Please enrol its hash and try again",
+-			L"",
+-			L"I will now execute HashTool for you to do this",
+-			NULL
+-		});
+-
+-	for (;;) {
+-	start_hashtool:
+-		status = execute(image, hashtool);
+-
+-		if (status != EFI_SUCCESS) {
+-			CHAR16 buf[256];
+-
+-			StrCpy(buf, L"Failed to start backup programme ");
+-			StrCat(buf, hashtool);
+-			console_error(buf, status);
+-
+-			goto out;
+-		}
+-
+-		/* try to start the loader again */
+-		status = execute(image, loader);
+-		if (status == EFI_ACCESS_DENIED
+-		    || status == EFI_SECURITY_VIOLATION) {
+-			int selection = console_select((CHAR16 *[]) {
+-				L"loader is still giving a security error",
+-				NULL
+-			}, (CHAR16 *[]) {
+-				L"Start HashTool",
+-				L"Exit",
+-				NULL
+-			}, 0);
+-			if (selection == 0)
+-				continue;
+-		}
+-
+-		break;
+-	}
+  out:
+ 	status = security_policy_uninstall();
+ 	if (status != EFI_SUCCESS)

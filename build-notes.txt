@@ -1,0 +1,26 @@
+certutil -d /etc/pki/pesign -N
+efikeygen -C -S -k -n grub -c "CN=grub"
+pesign -C grub.cer -c grub
+rpmbuild -ba grub2.spec --define "_sourcedir $PWD" --define "_topdir $PWD/rpmbuild" --define "efi_vendor grub" --define "pe_signing_cert grub"
+
+unpack everything
+
+grub2-mkimage -v -C auto -O i386-pc --prefix '(,msdos1)/efi/grub' -o EFI/grub/i386-pc/core.img 'fat' 'part_msdos' 'biosdisk' 'xzio' 'gcry_crc'
+
+fallocate -l 501M uefi-insecureboot-minimal.img
+fdisk uefi-insecureboot-minimal.img
+n
+p
+1
+2048
+enter
+t
+C
+w
+sudo losetup -Pf uefi-insecureboot-minimal.img
+sudo mkfs.vfat -F 32 /dev/loop0p1
+sudo mount /dev/loop0p1 mp
+cd mp
+cp -r ../../filesystem/EFI .
+
+sudo grub2-bios-setup  /dev/loop0 -d EFI/grub/i386-pc/ -v 

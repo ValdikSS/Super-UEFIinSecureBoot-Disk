@@ -1,0 +1,25 @@
+From a1cb51ec334a8df3acb92a3ac665624d5e16941f Mon Sep 17 00:00:00 2001
+From: ValdikSS <iam@valdikss.org.ru>
+Date: Sun, 24 Feb 2019 23:31:41 +0300
+Subject: [PATCH] Always assume Secure Boot is not enabled
+
+---
+ grub-core/kern/efi/sb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/grub-core/kern/efi/sb.c b/grub-core/kern/efi/sb.c
+index d74778b..1d73d84 100644
+--- a/grub-core/kern/efi/sb.c
++++ b/grub-core/kern/efi/sb.c
+@@ -28,7 +28,7 @@
+ int
+ grub_efi_secure_boot (void)
+ {
+-#ifdef GRUB_MACHINE_EFI
++#if 0
+   grub_efi_guid_t efi_var_guid = GRUB_EFI_GLOBAL_VARIABLE_GUID;
+   grub_size_t datasize;
+   char *secure_boot = NULL;
+-- 
+2.20.1
+
