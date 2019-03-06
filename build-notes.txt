@@ -5,7 +5,7 @@ rpmbuild -ba grub2.spec --define "_sourcedir $PWD" --define "_topdir $PWD/rpmbui
 
 unpack everything
 
-grub2-mkimage -v -C auto -O i386-pc --prefix '(,msdos1)/efi/grub' -o EFI/grub/i386-pc/core.img 'fat' 'part_msdos' 'biosdisk' 'xzio' 'gcry_crc'
+grub2-mkimage -v -C auto -O i386-pc --prefix '(,msdos1)/efi/grub' -o EFI/grub/i386-pc/core.img 'iso9660' 'fat' 'part_msdos' 'part_gpt' 'part_apple' 'biosdisk' 'xzio' 'gcry_crc'
 
 fallocate -l 501M uefi-insecureboot-minimal.img
 fdisk uefi-insecureboot-minimal.img

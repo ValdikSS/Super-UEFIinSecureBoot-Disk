@@ -1,0 +1,81 @@
+From d154160e518ca93ba2d39ff5d2ca8d986b7ee8b2 Mon Sep 17 00:00:00 2001
+From: ValdikSS <iam@valdikss.org.ru>
+Date: Tue, 5 Mar 2019 00:51:47 +0300
+Subject: [PATCH] Split linux and linuxefi
+
+---
+ grub-core/Makefile.core.def       | 11 ++++++++---
+ grub-core/loader/i386/efi/linux.c | 13 ++-----------
+ 2 files changed, 10 insertions(+), 14 deletions(-)
+
+diff --git a/grub-core/Makefile.core.def b/grub-core/Makefile.core.def
+index 1bf666b..297ccaf 100644
+--- a/grub-core/Makefile.core.def
++++ b/grub-core/Makefile.core.def
+@@ -1711,9 +1711,7 @@ module = {
+ 
+ module = {
+   name = linux;
+-  i386_pc = loader/i386/pc/linux.c;
+-  x86_64_efi = loader/i386/efi/linux.c;
+-  i386_efi = loader/i386/efi/linux.c;
++  x86 = loader/i386/linux.c;
+   xen = loader/i386/xen.c;
+   i386_pc = lib/i386/pc/vesa_modes_table.c;
+   mips = loader/mips/linux.c;
+@@ -1728,8 +1726,15 @@ module = {
+ 
+   common = loader/linux.c;
+   common = lib/cmdline.c;
++};
+ 
++module = {
++  name = linuxefi;
++  efi = loader/i386/efi/linux.c;
+   efi = loader/efi/linux.c;
++  /* efi = lib/cmdline.c; */
++  enable = i386_efi;
++  enable = x86_64_efi;
+ };
+ 
+ module = {
+diff --git a/grub-core/loader/i386/efi/linux.c b/grub-core/loader/i386/efi/linux.c
+index 851bce7..918b662 100644
+--- a/grub-core/loader/i386/efi/linux.c
++++ b/grub-core/loader/i386/efi/linux.c
+@@ -375,30 +375,21 @@ grub_cmd_linux (grub_command_t cmd __attribute__ ((unused)),
+   return grub_errno;
+ }
+ 
+-static grub_command_t cmd_linux, cmd_initrd;
+ static grub_command_t cmd_linuxefi, cmd_initrdefi;
+ 
+-GRUB_MOD_INIT(linux)
++GRUB_MOD_INIT(linuxefi)
+ {
+-  cmd_linux =
+-    grub_register_command ("linux", grub_cmd_linux,
+-                           0, N_("Load Linux."));
+   cmd_linuxefi =
+     grub_register_command ("linuxefi", grub_cmd_linux,
+                            0, N_("Load Linux."));
+-  cmd_initrd =
+-    grub_register_command ("initrd", grub_cmd_initrd,
+-                           0, N_("Load initrd."));
+   cmd_initrdefi =
+     grub_register_command ("initrdefi", grub_cmd_initrd,
+                            0, N_("Load initrd."));
+   my_mod = mod;
+ }
+ 
+-GRUB_MOD_FINI(linux)
++GRUB_MOD_FINI(linuxefi)
+ {
+-  grub_unregister_command (cmd_linux);
+   grub_unregister_command (cmd_linuxefi);
+-  grub_unregister_command (cmd_initrd);
+   grub_unregister_command (cmd_initrdefi);
+ }
+-- 
+2.20.1
+
