@@ -17,7 +17,7 @@ Super UEFIinSecureBoot Disk is a bootable image with GRUB2 bootloader designed t
 
 ## Based on:
 
- * [Red Hat shim](https://github.com/rhboot/shim) 13, [from Fedora](https://apps.fedoraproject.org/packages/shim-signed), signed with Microsoft key, for initial boot
+ * [Red Hat shim](https://github.com/rhboot/shim) (v13 for x86_64, v15 for i386), [from Fedora](https://apps.fedoraproject.org/packages/shim-signed), signed with Microsoft key, for initial boot
  * Modified [Linux Foundation PreLoader](https://git.kernel.org/pub/scm/linux/kernel/git/jejb/efitools.git) to install circumventing UEFI Security Policy
  * GRUB2 with security bypass patches to chainloader, linux/linuxefi and shim
 
@@ -46,6 +46,20 @@ First boot on a PC with Secure Boot will show Access Violation message box. Pres
 
 Computers without Secure Boot will boot to GRUB without manual intervention.
 
+## FAQ
+
+* **Does this disk work in Secure Boot?**  
+Yes, it does. It loads any unsigned or untrusted Linux kernel or .efi file or driver, after first-boot manual key enrolling using MokManager software. You don't need to disable Secure Boot to perform fist-boot key enrolling.
+
+* **Does this disk work on UEFI-based computers without Secure Boot, or with Secure Boot disabled?**  
+Yes, it would work like a stock GRUB2.
+
+* **Does this disk work on older computers with BIOS?**  
+Yes, it works just as any other GRUB2 bootloader.
+
+* **Can this disk be used to bypass Secure Boot in UEFI bootkit/virus?**  
+No, not really. *This* disk requires manual intervention of a physical user on first boot, which eliminates bootkit purpose to be stealth.
+
 ## Technical information
 
 UEFI boot process of this disk is performed in 3 stages.
@@ -56,6 +70,6 @@ UEFI boot process of this disk is performed in 3 stages.
 Shim contains embedded Fedora certificate (because it's extracted from Fedora repository). If Secure Boot is enabled, since grubx64.efi is not signed with embedded Fedora certificate, shim boots another executable, MokManager.efi, which is a special shim key management software. MokManager asks user to proceed with key or hash enrolling process.  
 Newer versions of shim install hooks for UEFI LoadImage, StartImage, ExitBootServices and Exit functions to "Harden against non-participating bootloaders", which should be bypassed for this disk use-case. Fedora's shim does not install custom UEFI security policies, that's why it's not possible to load self-signed efi files from second stage bootloader, even if you add their hashes or certificates using MokManager.
 
-**Stage 2**: preloader is a software similar to shim. It also performs executable validation and loads next efi file. Preloader included in this disk is a stripped down version which performs only one function: install allow-all UEFI security policy. This permits loading of arbitrary efi executables with LoadImage/StartImage UEFI functions even outside GRUB (for example, in UEFI Shell).
+**Stage 2**: preloader is a software similar to shim. It also performs executable validation and loads next efi file. Preloader included in this disk is a stripped down version which performs only one function: install allow-all UEFI security policy. This permits loading of arbitrary efi executables with LoadImage/StartImage UEFI functions even outside GRUB (for example, in UEFI Shell), and bypasses shim hardening.
 
-**Stage 3**: GRUB2 is a well-known universal bootloader. It has been patched to load .efi (or linux kernel) binaries into memory and jump into its entry point, without using UEFI functions, and to mimic "participating bootloader" for shim.
+**Stage 3**: GRUB2 is a well-known universal bootloader. It has been patched to load Linux kernel without additional vertification (linux/linuxefi commands), load .efi binaries into memory and jump into its entry point (chainloader command), and to mimic "participating bootloader" for shim.
