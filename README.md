@@ -60,6 +60,9 @@ Yes, it works just as any other GRUB2 bootloader.
 * **Can this disk be used to bypass Secure Boot in UEFI bootkit/virus?**  
 No, not really. *This* disk requires manual intervention of a physical user on first boot, which eliminates bootkit purpose to be stealth.
 
+* **Can I replace GRUB with another EFI bootloader (rEFInd, syslinux, systemd-boot)?**  
+Yes, replace `grubx64_real.efi`/`grubia32_real.efi` with your files. The bootloader does not require to be signed and should also start any .efi files thanks for Security Policy installed by `grubx64.efi`/`grubia32.efi` (PreLoader), just as GRUB2 included in disk.
+
 ## Technical information
 
 UEFI boot process of this disk is performed in 3 stages.
