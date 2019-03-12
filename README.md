@@ -76,3 +76,9 @@ Newer versions of shim install hooks for UEFI LoadImage, StartImage, ExitBootSer
 **Stage 2**: preloader is a software similar to shim. It also performs executable validation and loads next efi file. Preloader included in this disk is a stripped down version which performs only one function: install allow-all UEFI security policy. This permits loading of arbitrary efi executables with LoadImage/StartImage UEFI functions even outside GRUB (for example, in UEFI Shell), and bypasses shim hardening.
 
 **Stage 3**: GRUB2 is a well-known universal bootloader. It has been patched to load Linux kernel without additional vertification (linux/linuxefi commands), load .efi binaries into memory and jump into its entry point (chainloader command), and to mimic "participating bootloader" for shim.
+
+## Notes
+
+Super UEFIinSecureBoot Disk GRUB2 sets `suisbd=1` variable. It could be used to detect disk's patched GRUB2 in a `grub.conf` shared between multiple bootloaders.
+
+Since version 3, GRUB uses stock UEFI .efi file loader, as there are some problems with internal loader implementation. To use internal loader, add `set efi_internal_loader=1` into GRUB configuration file. Both methods can load untrusted .efi files.
