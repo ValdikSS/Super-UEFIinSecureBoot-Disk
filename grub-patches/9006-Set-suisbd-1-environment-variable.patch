@@ -1,0 +1,29 @@
+From 0f92b99013308067bcbacd9d52ca7f04346854fe Mon Sep 17 00:00:00 2001
+From: ValdikSS <iam@valdikss.org.ru>
+Date: Tue, 12 Mar 2019 20:41:56 +0300
+Subject: [PATCH] Set suisbd=1 environment variable
+
+This is useful in case of GRUB chaining, to distinguish between
+usual GRUB and Super UEFIinSecureBoot Disk GRUB inside
+GRUB config file.
+---
+ grub-core/kern/main.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/grub-core/kern/main.c b/grub-core/kern/main.c
+index dcf4872..e62d6a6 100644
+--- a/grub-core/kern/main.c
++++ b/grub-core/kern/main.c
+@@ -295,6 +295,9 @@ grub_main (void)
+   grub_env_export ("root");
+   grub_env_export ("prefix");
+ 
++  grub_env_set ("suisbd", "1");
++  grub_env_export ("suisbd");
++
+   /* Reclaim space used for modules.  */
+   reclaim_module_space ();
+ 
+-- 
+2.20.1
+
