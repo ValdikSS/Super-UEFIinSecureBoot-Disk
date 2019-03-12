@@ -1,0 +1,68 @@
+From f66cb13be617d1ba7468870ca2ab195ca0860869 Mon Sep 17 00:00:00 2001
+From: ValdikSS <iam@valdikss.org.ru>
+Date: Wed, 6 Mar 2019 23:59:35 +0300
+Subject: [PATCH] Switch between internal and UEFI loader with
+ efi_internal_loader variable
+
+By default, GRUB uses internal linuxefi/chainloader loading functions if shim is available
+and shim file verification is successful, to be able to load files which are untrusted from UEFI
+standpoint but trusted by shim MOK.
+This loader may be unreliable in some cases, and since there's allow-all UEFI security policy
+installed by PreLoader in Super UEFIinSecureBoot Disk, switch to LoadImage/StartImage UEFI
+functions by default with efi_internal_loader variable to re-enable internal loading.
+
+NOTE: internal loader is used for chainloader command only if shim_lock protocol is available
+as it uses shim's external PE header parser over shim_lock protocol.
+---
+ grub-core/loader/efi/linux.c | 24 +++++++++++++-----------
+ 1 file changed, 13 insertions(+), 11 deletions(-)
+
+diff --git a/grub-core/loader/efi/linux.c b/grub-core/loader/efi/linux.c
+index 43321cf..cd18f32 100644
+--- a/grub-core/loader/efi/linux.c
++++ b/grub-core/loader/efi/linux.c
+@@ -39,28 +39,30 @@ grub_linuxefi_secure_validate (void *data, grub_uint32_t size)
+   grub_efi_guid_t guid = SHIM_LOCK_GUID;
+   grub_efi_shim_lock_t *shim_lock;
+   grub_efi_status_t status;
++  const char *val;
+ 
+   shim_lock = grub_efi_locate_protocol(&guid, NULL);
+   grub_dprintf ("secureboot", "shim_lock: %p\n", shim_lock);
+-  if (!shim_lock)
++  if (shim_lock)
++    {
++      grub_dprintf ("secureboot", "Asking shim to verify kernel signature\n");
++      status = shim_lock->verify (data, size);
++      grub_dprintf ("secureboot", "shim_lock->verify(): %ld\n", (long int)status);
++    }
++  else
+     {
+       grub_dprintf ("secureboot", "shim not available\n");
+-      return 0;
+     }
+ 
+-  grub_dprintf ("secureboot", "Asking shim to verify kernel signature\n");
+-  status = shim_lock->verify (data, size);
+-  grub_dprintf ("secureboot", "shim_lock->verify(): %ld\n", (long int)status);
+-  if (status == GRUB_EFI_SUCCESS)
++  val = grub_env_get ("efi_internal_loader");
++  if (shim_lock && val && grub_strtoul (val, 0, 0))
+     {
+-      grub_dprintf ("secureboot", "Kernel signature verification passed\n");
++      grub_dprintf ("secureboot", "Using GRUB's internal loader\n");
+       return 1;
+     }
+ 
+-  grub_dprintf ("secureboot", "Kernel signature verification failed (0x%lx)\n",
+-		(unsigned long) status);
+-
+-  return 1;
++  grub_dprintf ("secureboot", "Using UEFI stock loader\n");
++  return 0;
+ }
+ 
+ #pragma GCC diagnostic push
+-- 
+2.20.1
+
