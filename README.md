@@ -77,6 +77,10 @@ Newer versions of shim install hooks for UEFI LoadImage, StartImage, ExitBootSer
 
 **Stage 3**: GRUB2 is a well-known universal bootloader. It has been patched to load Linux kernel without additional vertification (linux/linuxefi commands), load .efi binaries into memory and jump into its entry point (chainloader command), and to mimic "participating bootloader" for shim.
 
+## Additional information
+
+Read my article on this topic: [Exploiting signed bootloaders to circumvent UEFI Secure Boot](https://habr.com/ru/post/446238/) (also [available in Russian](https://habr.com/ru/post/446072/))
+
 ## Notes
 
 Super UEFIinSecureBoot Disk GRUB2 sets `suisbd=1` variable. It could be used to detect disk's patched GRUB2 in a `grub.conf` shared between multiple bootloaders.
