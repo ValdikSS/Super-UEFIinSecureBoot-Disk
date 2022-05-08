@@ -1,7 +1,7 @@
 Super UEFIinSecureBoot Disk
 ===========================
 
-Super UEFIinSecureBoot Disk is a bootable image with GRUB2 bootloader designed to be used as a base for recovery USB flash drives.
+Super UEFIinSecureBoot Disk is a _proof-of-concept (not actively maintained or enhanced)_ bootable image with GRUB2 bootloader designed to be used as a base for recovery USB flash drives.
 
 **Key feature:** disk is fully functional with UEFI Secure Boot mode activated. It can launch any operating system or .efi file, even with untrusted, invalid or missing signature.
 
@@ -17,7 +17,7 @@ Super UEFIinSecureBoot Disk is a bootable image with GRUB2 bootloader designed t
 
 ## Based on:
 
- * [Red Hat shim](https://github.com/rhboot/shim) (v13 for x86_64, v15 for i386), [from Fedora](https://koji.fedoraproject.org/koji/packageinfo?packageID=15107), signed with Microsoft key, for initial boot
+ * [Red Hat shim](https://github.com/rhboot/shim) (v15-8), [from Fedora](https://koji.fedoraproject.org/koji/packageinfo?packageID=15107), signed with Microsoft key, for initial boot
  * Modified [Linux Foundation PreLoader](https://git.kernel.org/pub/scm/linux/kernel/git/jejb/efitools.git) to install circumventing UEFI Security Policy
  * GRUB2 with security bypass patches to chainloader, linux/linuxefi and shim
 
